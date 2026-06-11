@@ -131,43 +131,36 @@
             width: 100%;
         }
 
-        /* Minimal Vector Icon Control Buttons */
-        .icon-btn {
-            background: transparent;
-            border: 1px solid var(--border-color);
-            padding: 8px 16px;
-            border-radius: 20px;
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
-            color: var(--text-primary);
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition-smooth);
-            z-index: 1001;
-        }
+       /* Minimal Vector Icon Control Buttons - ENLARGED */
+.icon-btn {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    padding: 0;             /* Removed padding to let width/height control size perfectly */
+    width: 46px;            /* Increased from 36px */
+    height: 46px;           /* Increased from 36px */
+    border-radius: 10px;    /* Slightly softened the corners for the larger size */
+    color: var(--text-primary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition-smooth);
+    z-index: 1001;
+}
+.icon-btn:hover {
+    border-color: var(--border-hover);
+    background: var(--bg-surface);
+}
 
-        .icon-btn:hover {
-            border-color: var(--border-hover);
-            background: var(--bg-surface);
-        }
-
-        .icon-btn svg {
-            width: 18px;
-            height: 18px;
-            fill: none;
-            stroke: currentColor;
-            stroke-width: 2;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
-
+.icon-btn svg {
+    width: 24px;            /* Increased icon scale from 18px */
+    height: 24px;           /* Increased icon scale from 18px */
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
         /* Hidden light-theme icon by default */
         .sun-icon { display: none; }
         [data-theme="light"] .sun-icon { display: block; }
