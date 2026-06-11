@@ -3,10 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enterprise Showcase Concept</title>
+    <title>Enterprise Multi-Page Showcase</title>
     <style>
-        /* Global Custom Properties */
+        /* CSS Variable System - DEFAULT: White/Light Theme */
         :root {
+            --bg-main: #ffffff;
+            --bg-surface: #f8f9fa;
+            --bg-surface-hover: #f1f3f5;
+            --border-color: rgba(0, 0, 0, 0.08);
+            --border-hover: rgba(0, 0, 0, 0.2);
+            --text-primary: #121212;
+            --text-secondary: #6c757d;
+            --accent-glow: linear-gradient(135deg, #0076ff, #00b4d8);
+            --transition-smooth: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            --page-transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Dark Theme Modifiers applied via JS */
+        [data-theme="dark"] {
             --bg-main: #0a0a0c;
             --bg-surface: #121216;
             --bg-surface-hover: #181820;
@@ -14,44 +28,32 @@
             --border-hover: rgba(255, 255, 255, 0.2);
             --text-primary: #ffffff;
             --text-secondary: #8e8e93;
-            --accent-glow: linear-gradient(135deg, #3a86ff, #00b4d8);
-            --transition-smooth: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* Reset and Base Layout */
+        /* Global Reset and Base Rules */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             -webkit-font-smoothing: antialiased;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
         }
 
-        html {
-            scroll-behavior: smooth;
-            background-color: var(--bg-main);
-        }
-
-        body {
+        html, body {
             background-color: var(--bg-main);
             color: var(--text-primary);
             overflow-x: hidden;
             line-height: 1.6;
+            height: 100%;
         }
 
-        /* Container Utilities */
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 0 40px;
         }
 
-        section {
-            padding: 140px 0;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        /* Global Typography Modifiers */
         .gradient-text {
             background: var(--accent-glow);
             -webkit-background-clip: text;
@@ -59,7 +61,8 @@
             display: inline-block;
         }
 
-      /* Navigation Style */
+
+        /* Navigation Design */
         nav {
             position: fixed;
             top: 0;
@@ -67,10 +70,8 @@
             width: 100%;
             z-index: 1000;
             border-bottom: 1px solid var(--border-color);
-            background: rgba(10, 10, 12, 0.7);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            transition: var(--transition-smooth);
+            background: var(--bg-main);
+            opacity: 0.98;
         }
 
         .nav-wrapper {
@@ -89,9 +90,15 @@
             color: var(--text-primary);
         }
 
+        .nav-controls {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+        }
+
         .nav-links {
             display: flex;
-            gap: 40px;
+            gap: 32px;
         }
 
         .nav-links a {
@@ -99,41 +106,98 @@
             color: var(--text-secondary);
             font-size: 14px;
             font-weight: 500;
+            position: relative;
+            padding: 8px 0;
             transition: var(--transition-smooth);
         }
 
-        .nav-links a:hover {
+        .nav-links a:hover, .nav-links a.active {
             color: var(--text-primary);
         }
 
-        /* Hero Layout Style */
-        .hero-section {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
+        /* Border indicator underneath active page link */
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--text-primary);
+            transition: var(--transition-smooth);
+        }
+
+        .nav-links a.active::after {
+            width: 100%;
+        }
+
+        /* Theme Toggle Button Style */
+        .theme-toggle {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 20px;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: var(--transition-smooth);
+        }
+
+        .theme-toggle:hover {
+            border-color: var(--border-hover);
+            background: var(--bg-surface);
+        }
+
+
+        /* SPA Page Controller States */
+        .page-wrapper {
             position: relative;
+            min-height: 100vh;
             padding-top: 90px;
         }
 
+        .page-view {
+            display: none;
+            opacity: 0;
+            transform: translateY(15px);
+            transition: var(--page-transition);
+            position: absolute;
+            width: 100%;
+            top: 90px;
+            left: 0;
+            padding-bottom: 100px;
+        }
+
+        /* Active Transition Animation */
+        .page-view.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+            position: relative;
+            top: 0;
+        }
+
+        /* Section Layout Helpers */
         .hero-grid {
             display: grid;
             grid-template-columns: 1.2fr 0.8fr;
             gap: 60px;
             align-items: center;
+            padding: 80px 0;
         }
 
-        .hero-content {
-            max-width: 680px;
-        }
+        .hero-content { max-width: 680px; }
 
         .hero-badge {
             display: inline-flex;
-            align-items: center;
             padding: 6px 14px;
-            background: rgba(255, 255, 255, 0.03);
+            background: var(--bg-surface);
             border: 1px solid var(--border-color);
             border-radius: 100px;
-            font-size: 12px;
+            font-size: 11px;
             letter-spacing: 1px;
             text-transform: uppercase;
             color: var(--text-secondary);
@@ -152,75 +216,50 @@
             font-size: 18px;
             color: var(--text-secondary);
             margin-bottom: 40px;
-            max-width: 540px;
         }
 
-        .btn-group {
-            display: flex;
-            gap: 20px;
-        }
+        /* Button Groups */
+        .btn-group { display: flex; gap: 20px; }
 
-        .primary-btn {
+        .primary-btn, .secondary-btn {
             display: inline-flex;
-            align-items: center;
             padding: 16px 32px;
-            background: var(--text-primary);
-            color: var(--bg-main);
             border-radius: 8px;
             font-size: 15px;
             font-weight: 600;
             text-decoration: none;
             transition: var(--transition-smooth);
+            cursor: pointer;
+        }
+
+        .primary-btn {
+            background: var(--text-primary);
+            color: var(--bg-main);
+            border: 1px solid var(--text-primary);
         }
 
         .primary-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 20px 40px rgba(255, 255, 255, 0.1);
+            opacity: 0.9;
         }
 
         .secondary-btn {
-            display: inline-flex;
-            align-items: center;
-            padding: 16px 32px;
             background: transparent;
             color: var(--text-primary);
             border: 1px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 15px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: var(--transition-smooth);
         }
 
         .secondary-btn:hover {
             border-color: var(--border-hover);
-            background: rgba(255, 255, 255, 0.02);
-        }
-
-        .hero-visual {
-            position: relative;
-            display: flex;
-            justify-content: center;
-        }
-
-        .abstract-shield {
-            width: 100%;
-            max-width: 380px;
-            height: auto;
-            opacity: 0.85;
-            transition: var(--transition-smooth);
-        }
-
-        .hero-visual:hover .abstract-shield {
-            transform: scale(1.03) rotate(1deg);
-            opacity: 1;
+            background: var(--bg-surface);
         }
 
 
-      /* Grid and Metric Layouts */
+        /* Grid Architectures */
         .section-header {
             max-width: 600px;
-            margin-bottom: 80px;
+            margin-bottom: 60px;
+            padding-top: 60px;
         }
 
         .section-label {
@@ -236,7 +275,6 @@
             font-size: 36px;
             font-weight: 700;
             letter-spacing: -1px;
-            line-height: 1.2;
         }
 
         .features-grid {
@@ -268,7 +306,6 @@
 
         .feature-card h3 {
             font-size: 20px;
-            font-weight: 600;
             margin-bottom: 16px;
             letter-spacing: -0.5px;
         }
@@ -276,19 +313,16 @@
         .feature-card p {
             color: var(--text-secondary);
             font-size: 15px;
-            line-height: 1.6;
         }
 
-        /* Metrics Area styling */
-        .metrics-section {
-            background: #0d0d11;
-        }
-
+        /* Metrics Data Styling */
         .metrics-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 40px;
-            text-align: center;
+            padding: 60px 0;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
         }
 
         .metric-item .number {
@@ -300,14 +334,13 @@
         }
 
         .metric-item .label {
-            font-size: 14px;
+            font-size: 13px;
             color: var(--text-secondary);
             text-transform: uppercase;
             letter-spacing: 1px;
         }
 
-
-      /* Grid Showcase Area */
+        /* Showcase Elements */
         .showcase-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -320,89 +353,58 @@
             border-radius: 16px;
             overflow: hidden;
             transition: var(--transition-smooth);
-            display: flex;
-            flex-direction: column;
         }
 
-        .showcase-item:hover {
-            border-color: var(--border-hover);
-        }
+        .showcase-item:hover { border-color: var(--border-hover); }
 
         .showcase-visual {
-            padding: 60px;
-            background: rgba(255, 255, 255, 0.01);
+            padding: 80px;
+            background: rgba(0, 0, 0, 0.02);
             display: flex;
             justify-content: center;
-            align-items: center;
             border-bottom: 1px solid var(--border-color);
-            transition: var(--transition-smooth);
         }
 
-        .showcase-item:hover .showcase-visual {
-            background: rgba(255, 255, 255, 0.02);
+        [data-theme="dark"] .showcase-visual {
+            background: rgba(255, 255, 255, 0.01);
         }
 
-        .showcase-icon {
-            width: 80px;
-            height: 80px;
-            color: var(--text-secondary);
-            transition: var(--transition-smooth);
-        }
+        .showcase-icon { width: 80px; height: 80px; color: var(--text-secondary); }
 
-        .showcase-item:hover .showcase-icon {
-            transform: scale(1.1);
-            color: var(--text-primary);
-        }
-
-        .showcase-meta {
-            padding: 32px;
-        }
+        .showcase-meta { padding: 32px; }
 
         .showcase-category {
             font-size: 11px;
             text-transform: uppercase;
-            letter-spacing: 1px;
             color: var(--text-secondary);
             margin-bottom: 8px;
             display: block;
         }
 
-        .showcase-name {
-            font-size: 22px;
-            font-weight: 600;
-            letter-spacing: -0.5px;
-        }
+        .showcase-name { font-size: 22px; font-weight: 600; }
 
-        /* Footer Style */
+        /* Global Footer */
         footer {
             padding: 60px 0;
-            background: var(--bg-main);
-        }
-
-        .footer-wrap {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            border-top: 1px solid var(--border-color);
+            margin-top: 100px;
             font-size: 13px;
             color: var(--text-secondary);
         }
 
-        /* Responsive Braking Points */
+        .footer-wrap { display: flex; justify-content: space-between; }
+
+        /* Media Queries */
         @media (max-width: 1024px) {
-            .hero-grid { grid-template-columns: 1fr; gap: 40px; text-align: center; }
-            .hero-content { max-width: 100%; }
+            .hero-grid { grid-template-columns: 1fr; text-align: center; }
             .btn-group { justify-content: center; }
-            .hero-visual { display: none; }
             .features-grid { grid-template-columns: repeat(2, 1fr); }
-            .metrics-grid { grid-template-columns: repeat(2, 1fr); gap: 30px; }
+            .metrics-grid { grid-template-columns: repeat(2, 1fr); }
             .showcase-grid { grid-template-columns: 1fr; }
         }
-
         @media (max-width: 768px) {
-            .container { padding: 0 24px; }
-            section { padding: 80px 0; }
             .nav-links { display: none; }
-            .hero-title { font-size: 40px; }
+            .hero-title { font-size: 38px; }
             .features-grid { grid-template-columns: 1fr; }
             .metrics-grid { grid-template-columns: 1fr; }
         }
@@ -410,145 +412,216 @@
 </head>
 <body>
 
-
-  <nav>
+    <nav>
         <div class="container">
             <div class="nav-wrapper">
-                <a href="#" class="nav-logo">Studio.Concept</a>
-                <div class="nav-links">
-                    <a href="#features">Capabilities</a>
-                    <a href="#metrics">Performance</a>
-                    <a href="#showcase">Interface</a>
+                <a href="#" class="nav-logo" onclick="switchPage('home')">Studio.Core</a>
+                <div class="nav-controls">
+                    <div class="nav-links">
+                        <a href="#" id="link-home" class="active" onclick="switchPage('home')">Overview</a>
+                        <a href="#" id="link-capabilities" onclick="switchPage('capabilities')">Capabilities</a>
+                        <a href="#" id="link-metrics" onclick="switchPage('metrics')">Performance</a>
+                        <a href="#" id="link-showcase" onclick="switchPage('showcase')">Showcase</a>
+                    </div>
+                    <button class="theme-toggle" id="themeBtn" onclick="toggleTheme()">Dark Mode</button>
                 </div>
             </div>
         </div>
     </nav>
 
-    <section class="hero-section">
-        <div class="container">
-            <div class="hero-grid">
-                <div class="hero-content">
-                    <div class="hero-badge">Digital Architecture Concept</div>
-                    <h1 class="hero-title">Engineered to translate perspective into <span class="gradient-text">retention.</span></h1>
-                    <p class="hero-description">An open, clean design canvas focused on premium aesthetics, built to work perfectly across any business model or structural market vertical.</p>
-                    <div class="btn-group">
-                        <a href="#" class="primary-btn">Initialize Platform</a>
-                        <a href="#" class="secondary-btn">Review Layout</a>
-                    </div>
-                </div>
-                <div class="hero-visual">
-                    <svg class="abstract-shield" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="100" cy="100" r="80" stroke="url(#hero-grad)" stroke-width="2" stroke-dasharray="4 4" />
-                        <rect x="60" y="60" width="80" height="80" rx="12" stroke="url(#hero-grad)" stroke-width="1.5" fill="rgba(18,18,22,0.6)" />
-                        <line x1="60" y1="100" x2="140" y2="100" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
-                        <line x1="100" y1="60" x2="100" y2="140" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
-                        <circle cx="100" cy="100" r="4" fill="#ffffff" />
-                        <defs>
-                            <linearGradient id="hero-grad" x1="0" y1="0" x2="200" y2="200" gradientUnits="userSpaceOnUse">
-                                <stop stop-color="#3a86ff"/>
-                                <stop offset="1" stop-color="#00b4d8"/>
-                            </linearGradient>
-                        </defs>
-                    </svg>
-                </div>
-            </div>
-        </div>
-    </section>
+    <div class="page-wrapper">
 
-    <section id="features">
-        <div class="container">
-            <div class="section-header">
-                <span class="section-label">Core Engineering</span>
-                <h2 class="section-title">Designed for businesses that prioritize absolute operational clarity.</h2>
-            </div>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="icon-container">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+        <div id="page-home" class="page-view active">
+            <div class="container">
+                <div class="hero-grid">
+                    <div class="hero-content">
+                        <div class="hero-badge">Multi-Tenant Canvas Matrix</div>
+                        <h1 class="hero-title">High-performance digital engines built for <span class="gradient-text">conversion.</span></h1>
+                        <p class="hero-description">An open, crystal-clean layout interface engineered to spotlight enterprise logic while fluidly preserving structural pixel beauty across any brand tier.</p>
+                        <div class="btn-group">
+                            <button class="primary-btn" onclick="switchPage('capabilities')">Explore Platform Modules</button>
+                            <button class="secondary-btn" onclick="switchPage('showcase')">View Interfaces</button>
+                        </div>
                     </div>
-                    <h3>Responsive Layouts</h3>
-                    <p>Designed fluidly to adapt smoothly to smartphones, tablets, and massive desktop systems with zero visual compromise.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="icon-container">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                    </div>
-                    <h3>Optimized Speeds</h3>
-                    <p>Lightweight programmatic footprints ensure immediate delivery and render cycles, maximizing direct conversions.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="icon-container">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                    </div>
-                    <h3>Secure Infrastructure</h3>
-                    <p>Modern development parameters ensure safety benchmarks align cleanly with current cloud protection standards.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-
-
-  <section id="metrics" class="metrics-section">
-        <div class="container">
-            <div class="metrics-grid">
-                <div class="metric-item">
-                    <div class="number gradient-text">99.9%</div>
-                    <div class="label">Operational Uptime</div>
-                </div>
-                <div class="metric-item">
-                    <div class="number gradient-text">&lt;100ms</div>
-                    <div class="label">Response Threshold</div>
-                </div>
-                <div class="metric-item">
-                    <div class="number gradient-text">150+</div>
-                    <div class="label">Deployments Completed</div>
-                </div>
-                <div class="metric-item">
-                    <div class="number gradient-text">4.9x</div>
-                    <div class="label">Conversion Lift Matrix</div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="showcase">
-        <div class="container">
-            <div class="section-header">
-                <span class="section-label">Modular Viewports</span>
-                <h2 class="section-title">Clean showcases to handle physical products or digital case assets.</h2>
-            </div>
-            <div class="showcase-grid">
-                <div class="showcase-item">
-                    <div class="showcase-visual">
-                        <svg class="showcase-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l-7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
-                    </div>
-                    <div class="showcase-meta">
-                        <span class="showcase-category">Product Architecture / Inventory</span>
-                        <div class="showcase-name">Structural Space Asset A</div>
-                    </div>
-                </div>
-                <div class="showcase-item">
-                    <div class="showcase-visual">
-                        <svg class="showcase-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="22" y1="12" x2="18" y2="12"></line><line x1="6" y1="12" x2="2" y2="12"></line><line x1="12" y1="6" x2="12" y2="2"></line><line x1="12" y1="22" x2="12" y2="18"></line></svg>
-                    </div>
-                    <div class="showcase-meta">
-                        <span class="showcase-category">Analytics Interface / Management</span>
-                        <div class="showcase-name">Structural Space Asset B</div>
+                    <div class="hero-visual">
+                        <svg width="100%" max-width="320px" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="100" cy="100" r="80" stroke="currentColor" stroke-width="1.5" stroke-dasharray="6 6" opacity="0.2"/>
+                            <rect x="55" y="55" width="90" height="90" rx="16" stroke="currentColor" stroke-width="2" fill="var(--bg-surface)"/>
+                            <path d="M85 100 L115 100" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M100 85 L100 115" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
 
+
+        <div id="page-capabilities" class="page-view">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-label">Core Architecture</span>
+                    <h2 class="section-title">Engineered layouts built to scale across standard modern markets.</h2>
+                </div>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="icon-container">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                        </div>
+                        <h3>Adaptive Viewports</h3>
+                        <p>Fully fluid breakpoints optimized mathematically to run natively across ultra-wide hardware down to single-hand responsive viewports.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="icon-container">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                        </div>
+                        <h3>Engine Delivery</h3>
+                        <p>Minimal semantic footprints ensure asset execution logic maps to fast loading tiers, dramatically cutting abandonment risk metrics.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="icon-container">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                        </div>
+                        <h3>Security Standards</h3>
+                        <p>System configuration patterns respect secure clean-coding guidelines, reinforcing user connection data layers perfectly.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div id="page-metrics" class="page-view">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-label">Data Framework</span>
+                    <h2 class="section-title">Verification parameters behind runtime presentation scaling.</h2>
+                </div>
+                <div class="metrics-grid">
+                    <div class="metric-item">
+                        <div class="number gradient-text">99.99%</div>
+                        <div class="label">System Availability</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="number gradient-text">&lt;85ms</div>
+                        <div class="label">Time to Interactive</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="number gradient-text">320+</div>
+                        <div class="label">Production Launches</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="number gradient-text">5.4x</div>
+                        <div class="label">Average Growth Spike</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div id="page-showcase" class="page-view">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-label">Visual Systems</span>
+                    <h2 class="section-title">Clean layout concepts customizable for individual business needs.</h2>
+                </div>
+                <div class="showcase-grid">
+                    <div class="showcase-item">
+                        <div class="showcase-visual">
+                            <svg class="showcase-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l-7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                        </div>
+                        <div class="showcase-meta">
+                            <span class="showcase-category">Inventory Management Module</span>
+                            <div class="showcase-name">Physical Space Layout Matrix</div>
+                        </div>
+                    </div>
+                    <div class="showcase-item">
+                        <div class="showcase-visual">
+                            <svg class="showcase-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="22" y1="12" x2="18" y2="12"></line><line x1="6" y1="12" x2="2" y2="12"></line><line x1="12" y1="6" x2="12" y2="2"></line><line x1="12" y1="22" x2="12" y2="18"></line></svg>
+                        </div>
+                        <div class="showcase-meta">
+                            <span class="showcase-category">Analytics / Direct Data Module</span>
+                            <div class="showcase-name">Structural Graph Pipeline</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div> ```
+
+---
+
+### Part 9: Footer & JavaScript Routing Engine Engine
+
+This final segment appends the global clean footer and injects the lightweight routing and theme switching JavaScript engines.
+
+```html
     <footer>
         <div class="container">
             <div class="footer-wrap">
-                <div>&copy; 2026 Architectural Studio Concept. All Rights Reserved.</div>
-                <div>Configured globally for cross-niche product presentation.</div>
+                <div>&copy; 2026 Core Architecture Engine. All structural variants modularly customizable.</div>
+                <div>Universally optimized framework platform blueprint.</div>
             </div>
         </div>
     </footer>
 
+    <script>
+        // SPA Routing Engine with Smooth Fade-And-Slide Animations
+        function switchPage(pageId) {
+            // Fetch all current active viewports
+            const activePage = document.querySelector('.page-view.active');
+            const targetPage = document.getElementById(`page-${pageId}`);
+            
+            if (activePage === targetPage) return;
+
+            // Step 1: Smoothly fade and lower active view
+            if (activePage) {
+                activePage.style.opacity = '0';
+                activePage.style.transform = 'translateY(15px)';
+                
+                setTimeout(() => {
+                    activePage.classList.remove('active');
+                    executeIncomingView(targetPage, pageId);
+                }, 300); // Maps to transition window speed
+            } else {
+                executeIncomingView(targetPage, pageId);
+            }
+        }
+
+        function executeIncomingView(targetPage, pageId) {
+            // Step 2: Show and lift targeted page view smoothly
+            targetPage.classList.add('active');
+            
+            // Force browser layout repaint calculation to ensure seamless UI transition
+            targetPage.offsetHeight; 
+            
+            targetPage.style.opacity = '1';
+            targetPage.style.transform = 'translateY(0)';
+
+            // Update Navigation links indicator states
+            document.querySelectorAll('.nav-links a').forEach(link => link.classList.remove('active'));
+            const targetedLink = document.getElementById(`link-${pageId}`);
+            if (targetedLink) targetedLink.classList.add('active');
+
+            // Automatically scroll window smoothly back to top viewport
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Lightweight Theme Engine Controller
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const targetTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            const toggleBtn = document.getElementById('themeBtn');
+
+            document.documentElement.setAttribute('data-theme', targetTheme);
+            
+            if (targetTheme === 'dark') {
+                toggleBtn.textContent = "Light Mode";
+            } else {
+                toggleBtn.textContent = "Dark Mode";
+            }
+        }
+    </script>
 </body>
 </html>
+
+
